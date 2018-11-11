@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import { Text, View, Switch, StyleSheet } from 'react-native'
 import { PRIORITIES } from './constants';
 
 const priorityColor = {
@@ -14,10 +14,17 @@ export default class Row extends Component {
   }
   
   render() {
+    const done = this.props.done;
     return (
       <View style={styles.container}>
-        <Text style={{marginRight: 10}}>{this.props.text}</Text>
-        <Text style={{backgroundColor: priorityColor[this.props.priority]}}> ! </Text>
+        <Switch
+          value={done}
+          onValueChange={this.props.onDone}
+        />
+        <View styles={styles.textWrap}>
+          <Text style={[styles.text, done && styles.done]}>{this.props.text}</Text>
+        </View>
+        <Text style={[styles.text, {backgroundColor: priorityColor[this.props.priority]}]}> ! </Text>
       </View>
     )
   }
@@ -28,10 +35,19 @@ const styles = StyleSheet.create({
     padding: 10,
     flexDirection: "row",
     alignItems: "flex-start",
-    justifyContent: "space-between"
+    justifyContent: "flex-start",
+    flex: 1
+  },
+  textWrap: {
+    flex: 1,
+    marginHorizontal: 10
   },
   text: {
     fontSize: 24,
     color: "#4D4D4D",
+  },
+  done: {
+    textDecorationLine: "line-through",
+    backgroundColor: "lightgray"
   }
 })

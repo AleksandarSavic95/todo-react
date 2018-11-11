@@ -19,6 +19,7 @@ export default class App extends Component { // <Props> {
       dataSource: ds.cloneWithRows([])
     }
     this.setSource = this.setSource.bind(this);
+    this.handleToggleDone = this.handleToggleDone.bind(this);
     this.handleAddItem = this.handleAddItem.bind(this);
   }
 
@@ -36,6 +37,17 @@ export default class App extends Component { // <Props> {
     })
   }
 
+  handleToggleDone(key, done) {
+    const newItems = this.state.items.map((item) => {
+      if (item.key !== key) return item;
+      return {
+        ...item,
+        done // done: true or false
+      }
+    })
+    this.setSource(newItems, newItems);
+  }
+
   handleAddItem() {
     if (!this.state.text) return; // ignore empty strings
     const newItems = [
@@ -44,7 +56,7 @@ export default class App extends Component { // <Props> {
         key: Date.now(),
         text: this.state.text,
         priority: this.state.priority,
-        complete: false
+        done: false
       }
     ]
     this.setSource(newItems, newItems, { text: "", priority: PRIORITIES.MEDIUM })
@@ -77,6 +89,7 @@ export default class App extends Component { // <Props> {
             renderRow={({key, ...value}) => {
               return (
                 <Row
+                  onDone={(done) => this.handleToggleDone(key, done)}
                   key={key}
                   {...value}
                 />
