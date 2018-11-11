@@ -3,31 +3,35 @@ import {StyleSheet, Text, View} from 'react-native';
 
 import Header from './header';
 import Footer from './footer';
+import { PRIORITIES } from './constants';
 
 // type Props = {};
 export default class App extends Component { // <Props> {
   constructor(props) {
     super(props);
     this.state = {
-      value: "",
+      text: "",
+      priority: PRIORITIES.MEDIUM,
       items: []
     }
     this.handleAddItem = this.handleAddItem.bind(this);
   }
 
   handleAddItem() {
-    if (!this.state.value) return; // ignore empty strings
+    if (!this.state.text) return; // ignore empty strings
     const newItems = [
       ...this.state.items,
       {
         key: Date.now(),
-        text: this.state.value,
+        text: this.state.text,
+        priority: this.state.priority,
         complete: false
       }
     ]
     this.setState({
       items: newItems,
-      value: ""
+      text: "",
+      priority: PRIORITIES.MEDIUM
     })
   }
 
@@ -35,11 +39,16 @@ export default class App extends Component { // <Props> {
     return (
       <View style={styles.container}>
         <Header
-          value={this.state.value}
+          value={this.state.text}
+          priority={this.state.priority}
           onAddItem={this.handleAddItem}
-          onChange={(value) => this.setState({ value })}/>
+          onTextChange={(text) => { console.log(text); this.setState({ text });}}
+          onPriorityChange={(value, index) => {
+            console.log(value);
+            this.setState({ priority: value }, () => { console.log(this.state.priority) });
+          }}/>
         <View style={styles.content}>
-          <Text>BUM!</Text>
+          <Text></Text>
         </View>
         <Footer />
       </View>
