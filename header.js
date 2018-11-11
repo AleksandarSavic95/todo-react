@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, View, StyleSheet, TextInput, Picker } from 'react-native'
+import { TouchableOpacity, Text, View, StyleSheet, TextInput, Picker } from 'react-native'
 import { PRIORITIES } from './constants';
 
 export default class Header extends Component {
@@ -14,8 +14,8 @@ export default class Header extends Component {
 
   render() {
     return (
-        <View>
-      <View style={styles.header}>
+      <View>
+        <View style={styles.header}>
         <TextInput
           value={this.props.value}
           onChangeText={this.props.onTextChange}
@@ -23,7 +23,7 @@ export default class Header extends Component {
           placeholder="What do you need to do?"
           blurOnSubmit={false}
           returnKeyType="done"
-          style={styles.input}/>
+          style={styles.input} />
         <Picker
           selectedValue={this.props.priority}
           itemStyle={styles.pickerItem}
@@ -33,14 +33,12 @@ export default class Header extends Component {
           <Picker.Item label="Medium" value={PRIORITIES.MEDIUM} />
           <Picker.Item label="High" value={PRIORITIES.HIGH} />
         </Picker>
-      </View>
-      <View>
-        <Button
-          onPress={this.props.onAddItem}
-          title="Create"
-          color="#009900"
-        />
-      </View>
+        </View>
+        <View>
+          <TouchableOpacity onPress={this.props.onAddItem}>
+            <Text style={styles.createButton}>Create</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     )
   }
@@ -59,11 +57,24 @@ const styles = StyleSheet.create({
     pickerItem: {
         /*fontSize: 10*/
     },
-    header: {
-        paddingHorizontal: 16,
+    createButton: {
+        /*
+        color: "#009900",
+        backgroundColor: "gray" */
+        backgroundColor: 'blue',
+        // borderRadius: 12,
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+        overflow: 'hidden',
+        padding: 12,
+        marginHorizontal: 20,
+        textAlign:'center'
+    },
+    header: { // https://facebook.github.io/react-native/docs/flexbox
+        paddingHorizontal: 20,
         flexDirection: "row",
         justifyContent: "space-around",
-        alignItems: "center",
-
+        alignItems: "center", // !
     }
 })
