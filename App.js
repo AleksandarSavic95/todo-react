@@ -5,27 +5,23 @@ import Header from './header';
 import Footer from './footer';
 import { PRIORITIES } from './constants';
 
-// type Props = {};
-export default class App extends Component { // <Props> {
+export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: "",
-      priority: PRIORITIES.MEDIUM,
       items: []
     }
-    this.handleAddItem = this.handleAddItem.bind(this);
   }
 
-  handleAddItem() {
-    if (!this.state.text) return; // ignore empty strings
+  handleAddItem = (item) => {
+    if (!item.text) return; // ignore empty strings
     const newItems = [
       ...this.state.items,
       {
         key: Date.now(),
-        text: this.state.text,
-        priority: this.state.priority,
-        complete: false
+        text: item.text,
+        priority: item.priority,
+        done: false
       }
     ]
     this.setState({
@@ -39,16 +35,9 @@ export default class App extends Component { // <Props> {
     return (
       <View style={styles.container}>
         <Header
-          value={this.state.text}
-          priority={this.state.priority}
-          onAddItem={this.handleAddItem}
-          onTextChange={(text) => { console.log(text); this.setState({ text });}}
-          onPriorityChange={(value, index) => {
-            console.log(value);
-            this.setState({ priority: value }, () => { console.log(this.state.priority) });
-          }}/>
+          onAddItem={this.handleAddItem}/>
         <View style={styles.content}>
-          <Text></Text>
+          <Text />
         </View>
         <Footer />
       </View>
