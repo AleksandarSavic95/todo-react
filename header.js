@@ -5,11 +5,19 @@ import { PRIORITIES } from './constants';
 export default class Header extends Component {
   constructor(props) {
       super(props);
+      this.state = {
+        text: "",
+        priority: PRIORITIES.MEDIUM
+      }
   }
 
-  componentWillReceiveProps(nextProps) {
-    console.log('received', nextProps.priority);
-    console.log('received', nextProps);
+  onTextChange = (text) => {console.log(text);this.setState({ text })}
+
+  onPriorityChange = (value, index) => {console.log(value); this.setState({ priority: value })}
+
+  addItem = () => {
+    this.props.onAddItem(this.state);
+    this.setState({ text: "", priority: PRIORITIES.MEDIUM });
   }
 
   render() {
@@ -17,25 +25,24 @@ export default class Header extends Component {
       <View>
         <View style={styles.header}>
         <TextInput
-          value={this.props.value}
-          onChangeText={this.props.onTextChange}
-          onSubmitEditing={this.props.onAddItem}
+          value={this.state.text}
+          onChangeText={this.onTextChange}
           placeholder="What do you need to do?"
           blurOnSubmit={false}
           returnKeyType="done"
           style={styles.input} />
         <Picker
-          selectedValue={this.props.priority}
-          itemStyle={styles.pickerItem}
+          selectedValue={this.state.priority}
           style={styles.picker}
-          onValueChange={this.props.onPriorityChange} >
+          itemStyle={styles.pickerItem}
+          onValueChange={this.onPriorityChange} >
           <Picker.Item label="Low" value={PRIORITIES.LOW} />
           <Picker.Item label="Medium" value={PRIORITIES.MEDIUM} />
           <Picker.Item label="High" value={PRIORITIES.HIGH} />
         </Picker>
         </View>
         <View>
-          <TouchableOpacity onPress={this.props.onAddItem}>
+          <TouchableOpacity onPress={this.addItem}>
             <Text style={styles.createButton}>Create</Text>
           </TouchableOpacity>
         </View>
@@ -55,14 +62,9 @@ const styles = StyleSheet.create({
         padding: 0
     },
     pickerItem: {
-        /*fontSize: 10*/
     },
     createButton: {
-        /*
-        color: "#009900",
-        backgroundColor: "gray" */
         backgroundColor: 'blue',
-        // borderRadius: 12,
         color: 'white',
         fontSize: 20,
         fontWeight: 'bold',
@@ -71,10 +73,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         textAlign:'center'
     },
-    header: { // https://facebook.github.io/react-native/docs/flexbox
+    header: {
         paddingHorizontal: 20,
         flexDirection: "row",
         justifyContent: "space-around",
-        alignItems: "center", // !
+        alignItems: "center"
     }
 })
