@@ -15,12 +15,17 @@ export default class Header extends Component {
 
   onPriorityChange = (value, index) => {console.log(value); this.setState({ priority: value })}
 
+  addItem = () => {
+    this.props.onAddItem(this.state);
+    this.setState({ text: "", priority: PRIORITIES.MEDIUM });
+  }
+
   render() {
     return (
       <View>
         <View style={styles.header}>
         <TextInput
-          value={this.state.value}
+          value={this.state.text}
           onChangeText={this.onTextChange}
           placeholder="What do you need to do?"
           blurOnSubmit={false}
@@ -37,7 +42,7 @@ export default class Header extends Component {
         </Picker>
         </View>
         <View>
-          <TouchableOpacity onPress={() => {console.log(this.state);this.props.onAddItem(this.state)}}>
+          <TouchableOpacity onPress={this.addItem}>
             <Text style={styles.createButton}>Create</Text>
           </TouchableOpacity>
         </View>
