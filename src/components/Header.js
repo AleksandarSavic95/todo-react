@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { TouchableOpacity, Text, View, StyleSheet, TextInput, Picker } from 'react-native'
-import { PRIORITIES } from './constants';
+import { PRIORITIES } from '../../constants';
 
 export default class Header extends Component {
   constructor(props) {
