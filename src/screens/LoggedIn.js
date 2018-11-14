@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { StyleSheet, View, ListView, Keyboard } from 'react-native';
 
+import { Button } from '../components/common/';
+
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Row from '../components/Row';
@@ -57,6 +59,9 @@ export default class LoggedIn extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Button onPress={this.props.deleteJWT}>
+          Log out
+        </Button>
         <Header
           onAddItem={this.handleAddItem}/>
         <View style={styles.content}>

@@ -6,7 +6,7 @@ export default class Auth extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showLogin: false
+      showLogin: true
     };
   }
 
@@ -19,11 +19,17 @@ export default class Auth extends Component {
   whichForm = () => {
     if (!this.state.showLogin){
       return(
-        <Registration toggleAuthForm={this.toggleAuthForm}/>
+        <Registration
+          toggleAuthForm={this.toggleAuthForm}
+          setJWT={this.props.setJWT}
+        />
       );
     } else {
       return(
-        <Login toggleAuthForm={this.toggleAuthForm}/>
+        <Login
+          toggleAuthForm={this.toggleAuthForm}
+          setJWT={this.props.setJWT}
+        />
       );
     }
   }

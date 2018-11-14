@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import { View, Text } from 'react-native';
 import { Input, TextLink, Button, Loading } from './common';
-import axios from 'axios';
 
+import axios from 'axios';
 import deviceStorage from '../services/deviceStorage';
+import { JWT_STORAGE_KEY } from '../constants';
 
 
 class Registration extends Component {
@@ -20,8 +21,6 @@ class Registration extends Component {
   }
 
   registerUser = () => {
-    console.log('------STATE----\n', this.state);
-
     const { name, email, password, password_confirmation } = this.state;
 
     this.setState({ error: '', loading: true });
@@ -33,8 +32,7 @@ class Registration extends Component {
       password_confirmation
     })
     .then((response) => {
-      const { access_token, token_type, expires_in } = response.data;
-      console.log(access_token, token_type, expires_in);
+      const { access_token } = response.data;
       if (!access_token) {
         const errorsByField = response.data;
         
@@ -46,15 +44,21 @@ class Registration extends Component {
         this.setState({ error: errorMessage.slice(0, -1), loading: false });
       }
       else {
-        deviceStorage.saveItem("access_token", access_token);
+        deviceStorage.saveItem(JWT_STORAGE_KEY, access_token);
+        this.props.setJWT(access_token);
       }
-      
     })
     .catch((error) => {
-      console.log('request error', error);
-      this.setState({ error });
+      console.log(error);
+      // deep destructuring - error.response.status  and  error.response.data.exception
+      const { response: { status }, response: { data: { exception } } } = error;
+      let requestErrorMessage = `Error ${status} - ${exception}`;
+      // if it's not an exception, then it is "Unauthorized" or a similar message
+      if (!exception) {
+        requestErrorMessage = `Error ${status} - ${error.response.data.error}`;
+      }
+      this.setState({ error: requestErrorMessage, loading: false });
     });
-
   }
 
   render() {
