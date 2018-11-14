@@ -3,6 +3,8 @@ import { View, Text } from 'react-native';
 import { Input, TextLink, Button, Loading } from './common';
 import axios from 'axios';
 
+import deviceStorage from '../services/deviceStorage';
+
 
 class Registration extends Component {
   constructor(props) {
@@ -31,7 +33,9 @@ class Registration extends Component {
       password_confirmation
     })
     .then((response) => {
-      if (!response.data.access_token) {
+      const { access_token, token_type, expires_in } = response.data;
+      console.log(access_token, token_type, expires_in);
+      if (!access_token) {
         const errorsByField = response.data;
         
         let errorMessage = '';
@@ -41,7 +45,10 @@ class Registration extends Component {
         // strip last '\n'
         this.setState({ error: errorMessage.slice(0, -1), loading: false });
       }
-      // TODO: Handle the JWT { access_token, token_type, expires_in }
+      else {
+        deviceStorage.saveItem("access_token", access_token);
+      }
+      
     })
     .catch((error) => {
       console.log('request error', error);
