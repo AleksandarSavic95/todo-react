@@ -25,43 +25,26 @@ class Registration extends Component {
     this.setState({ error: '', loading: true });
 
     axios.post("http://app-backend.test/api/auth/register", {
-      name: name,
-      email: email,
-      password: password,
-      password_confirmation: password_confirmation
+      name,
+      email,
+      password,
+      password_confirmation
     })
     .then((response) => {
-      console.log('\nresponse data:', response.data);
       if (!response.data.access_token) {
-        console.log('errors!');
         const errorsByField = response.data;
         
         let errorMessage = '';
         for (fieldName in errorsByField) {
-          console.log(fieldName);
-          // errorMessage += fieldName + ': ';
-          console.log(errorsByField[fieldName]);
-
-          errorsByField[fieldName].forEach(fieldError => {
-            errorMessage += fieldError + ' ';
-            console.log('fieldError:', fieldError);
-          });
-          errorMessage += '\n';
+          errorMessage += errorsByField[fieldName].join(' ') + '\n';
         }
-        console.log('\n=== FINAL ERROR MESSAGE ===', errorMessage);
-        this.setState({ error: errorMessage.slice(0, -1), loading: false }); // strip last '\n'
+        // strip last '\n'
+        this.setState({ error: errorMessage.slice(0, -1), loading: false });
       }
-      // Handle the JWT response here
-      /**
-      * {
-          "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9hcHAtYmFja2VuZC50ZXN0XC9hcGlcL2F1dGhcL3JlZ2lzdGVyIiwiaWF0IjoxNTQyMjAzNzI1LCJleHAiOjE1NDIyNjEzMjUsIm5iZiI6MTU0MjIwMzcyNSwianRpIjoiWDdhamg3QnNXYnFUdjQ3YyIsInN1YiI6MTIsInBydiI6Ijg3ZTBhZjFlZjlmZDE1ODEyZmRlYzk3MTUzYTE0ZTBiMDQ3NTQ2YWEifQ.t3Auu3iZ8DIW4WknFS24Cjh4LdYdeQrnva1-97lWdUY",
-          "token_type": "bearer",
-          "expires_in": 57600
-        }
-      */
+      // TODO: Handle the JWT { access_token, token_type, expires_in }
     })
     .catch((error) => {
-      console.log(error);
+      console.log('request error', error);
       this.setState({ error });
     });
 
