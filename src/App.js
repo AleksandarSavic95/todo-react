@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import { StyleSheet, View, ListView, Keyboard } from 'react-native';
 
-import Header from './header';
-import Footer from './footer';
-import Row from './row';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Row from '../row';
 
 export default class App extends Component {
   constructor(props) {
