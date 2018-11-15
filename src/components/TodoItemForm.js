@@ -1,46 +1,56 @@
 import React, { Component } from 'react'
-import { TouchableOpacity, Text, View, StyleSheet, TextInput, Picker } from 'react-native'
+import { Text, View, StyleSheet, TextInput, Picker } from 'react-native'
 import { PRIORITIES } from '../../constants';
 
-import axios from 'axios';
-import deviceStorage from '../services/deviceStorage';
+import { Loading, Button } from '../components/common';
+
 import { postAuthenticated } from '../services/apiService';
 
-export default class Header extends Component {
+export default class TodoItemForm extends Component {
   constructor(props) {
-      super(props);
-      this.state = {
-        title: "",
-        content: "",
-        priority: PRIORITIES.MEDIUM
-      }
+    super(props);
+    this.state = {
+      title: "",
+      content: "",
+      priority: PRIORITIES.MEDIUM,
+      error: "",
+      loading: false
+    }
   }
 
-  onTitleChange = (title) => {console.log(title);this.setState({ title })}
+  onTitleChange = (title) => { this.setState({ title })}
 
-  onChangeContent = (content) => {console.log(content);this.setState({ content })}
+  onChangeContent = (content) => { this.setState({ content })}
 
-  onPriorityChange = (value, index) => {console.log(value); this.setState({ priority: value })}
+  onPriorityChange = (value, index) => { this.setState({ priority: value })}
 
   addItem = () => {
     const { title, content, priority } = this.state;
-    console.log("\nCREATING:", title, content, priority);
+    if (!title || !content) {
+      this.setState({ error: "Title and content are required fields!"})
+      return;
+    }
 
-    // this.setState({ error: '', loading: true }); // TODO: add error and here?
+    this.setState({ error: "", loading: true });
 
     postAuthenticated("http://app-backend.test/api/todoitems", {
       title,
       content,
       priority
-    }, (createdItem) => {
-      console.log('\nCREATED ITEM ', createdItem, '\n');
-      if (!createdItem) return;
-      this.props.onAddItem(createdItem);
-      this.setState({ title: "", content: "", priority: PRIORITIES.MEDIUM }); // error: '', loading: false
+    }, (response) => {
+      if (!response) return;
+      if (!response.title) {
+        this.setState(response); // if there are errors, only "error" and "loading" are returned
+      }
+      else {
+        this.props.onAddItem(response);
+        this.setState({ title: "", content: "", priority: PRIORITIES.MEDIUM, error: "", loading: false });
+      }
     });
   }
 
   render() {
+    const { error, loading } = this.state;
     return (
       <View>
         <View style={styles.titleInputWrap}>
@@ -73,9 +83,17 @@ export default class Header extends Component {
             style={styles.contentInput} />
         </View>
         <View>
-          <TouchableOpacity onPress={this.addItem}>
-            <Text style={styles.createButton}>Create</Text>
-          </TouchableOpacity>
+          <Text style={styles.errorTextStyle}>
+            {error}
+          </Text>
+          {
+            !loading ?
+            <Button onPress={this.addItem} styleProp={styles.createButton}>
+              Create
+            </Button>
+            :
+            <Loading size={'large'} />
+          }
         </View>
       </View>
     )
@@ -100,7 +118,8 @@ const styles = StyleSheet.create({
     pickerItem: {
     },
     createButton: {
-      backgroundColor: 'blue',
+      flex: 1,
+      backgroundColor: 'green',
       color: 'white',
       fontSize: 20,
       fontWeight: 'bold',
@@ -121,5 +140,10 @@ const styles = StyleSheet.create({
       flexDirection: "row",
       justifyContent: "space-around",
       alignItems: "center"
+    },
+    errorTextStyle: {
+      alignSelf: 'center',
+      fontSize: 18,
+      color: 'red'
     }
 })
