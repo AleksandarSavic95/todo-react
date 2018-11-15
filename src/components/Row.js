@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Text, View, Switch, StyleSheet } from 'react-native'
-import { PRIORITIES } from './constants';
+import { PRIORITIES } from '../../constants';
 
 const priorityColor = {
     [PRIORITIES.LOW]: 'green',
@@ -22,7 +22,7 @@ export default class Row extends Component {
           onValueChange={this.props.onDone}
         />
         <View styles={styles.textWrap}>
-          <Text style={[styles.text, done && styles.done]}>{this.props.text}</Text>
+          <Text style={[styles.text, done && styles.done]}>{this.props.title}</Text>
         </View>
         <Text style={[styles.text, {backgroundColor: priorityColor[this.props.priority]}]}> ! </Text>
       </View>
