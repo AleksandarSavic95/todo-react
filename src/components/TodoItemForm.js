@@ -2,6 +2,10 @@ import React, { Component } from 'react'
 import { TouchableOpacity, Text, View, StyleSheet, TextInput, Picker } from 'react-native'
 import { PRIORITIES } from '../../constants';
 
+import axios from 'axios';
+import deviceStorage from '../services/deviceStorage';
+import { postAuthenticated } from '../services/apiService';
+
 export default class Header extends Component {
   constructor(props) {
       super(props);
@@ -19,8 +23,21 @@ export default class Header extends Component {
   onPriorityChange = (value, index) => {console.log(value); this.setState({ priority: value })}
 
   addItem = () => {
-    this.props.onAddItem(this.state);
-    this.setState({ title: "", content: "", priority: PRIORITIES.MEDIUM });
+    const { title, content, priority } = this.state;
+    console.log("\nCREATING:", title, content, priority);
+
+    // this.setState({ error: '', loading: true }); // TODO: add error and here?
+
+    postAuthenticated("http://app-backend.test/api/todoitems", {
+      title,
+      content,
+      priority
+    }, (createdItem) => {
+      console.log('\nCREATED ITEM ', createdItem, '\n');
+      if (!createdItem) return;
+      this.props.onAddItem(createdItem);
+      this.setState({ title: "", content: "", priority: PRIORITIES.MEDIUM }); // error: '', loading: false
+    });
   }
 
   render() {

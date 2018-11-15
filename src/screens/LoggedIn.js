@@ -44,15 +44,14 @@ export default class LoggedIn extends Component {
   }
 
   handleAddItem = (item) => {
-    if (!item.title) return; // ignore if title is empty
     const newItems = [
-      ...this.state.items,
+      ...this.state.items, // TODO: try  `, item` instead of {...}
       {
-        key: Date.now(),
+        id: item.id,
         title: item.title,
         content: item.content,
         priority: item.priority,
-        done: false
+        done: item.done
       }
     ]
     this.setSource(newItems, newItems);
