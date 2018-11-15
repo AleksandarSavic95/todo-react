@@ -3,8 +3,9 @@ import { StyleSheet, View, ListView, Keyboard } from 'react-native';
 
 import { Button } from '../components/common/';
 
-import Header from '../components/Header';
+import TodoItemForm from '../components/TodoItemForm';
 import Footer from '../components/Footer';
+
 import Row from '../components/Row';
 
 export default class LoggedIn extends Component {
@@ -43,12 +44,13 @@ export default class LoggedIn extends Component {
   }
 
   handleAddItem = (item) => {
-    if (!item.text) return; // ignore empty strings
+    if (!item.title) return; // ignore if title is empty
     const newItems = [
       ...this.state.items,
       {
         key: Date.now(),
-        text: item.text,
+        title: item.title,
+        content: item.content,
         priority: item.priority,
         done: false
       }
@@ -62,8 +64,7 @@ export default class LoggedIn extends Component {
         <Button onPress={this.props.deleteJWT}>
           Log out
         </Button>
-        <Header
-          onAddItem={this.handleAddItem}/>
+        <TodoItemForm onAddItem={this.handleAddItem}/>
         <View style={styles.content}>
           <ListView
             style={styles.list}
