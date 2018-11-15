@@ -39,14 +39,30 @@ export function postAuthenticated(url, data, callback) {
   console.log("\n==== postAuthenticated =====");
   deviceStorage.getJWT()
     .then(token => {
-      console.log("GOT TOKEN", token);
       post(url, data, { headers: { Authorization: "Bearer " + token }})
       .then((item) => {
         callback(item);
       })
     })
     .catch(error => {
-      console.log("\n postAuthenticataed E R R O R!")
-      console.log(error);
+      console.log("Error", error);
     });
+}
+
+/**
+ * Loads the todoItems of the authenticated user and adds them to the ListView.
+ */
+export async function getTodoItems() {
+  console.log("\n==== getTodoItems =====");
+  try {
+    const token = await deviceStorage.getJWT();
+    const response = await axios.get("http://app-backend.test/api/todoitems", { headers: { Authorization: "Bearer " + token }});
+    const items = response.data;
+    if (items) {
+      this.setSource(items, items);
+    }
+  }
+  catch (error) {
+    console.log("Error", error, error.message);
+  }
 }

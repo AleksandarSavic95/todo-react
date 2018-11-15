@@ -7,6 +7,7 @@ import TodoItemForm from '../components/TodoItemForm';
 import Footer from '../components/Footer';
 
 import Row from '../components/Row';
+import { getTodoItems } from '../services/apiService';
 
 export default class LoggedIn extends Component {
   constructor(props) {
@@ -16,6 +17,8 @@ export default class LoggedIn extends Component {
       items: [],
       dataSource: ds.cloneWithRows([])
     }
+    this.loadItems = getTodoItems.bind(this);
+    this.loadItems();
   }
 
   /**
@@ -32,9 +35,9 @@ export default class LoggedIn extends Component {
     })
   }
 
-  handleToggleDone = (key, done) => {
+  handleToggleDone = (itemId, done) => {
     const newItems = this.state.items.map((item) => {
-      if (item.key !== key) return item;
+      if (item.id !== itemId) return item;
       return {
         ...item,
         done // done: true or false
@@ -45,14 +48,7 @@ export default class LoggedIn extends Component {
 
   handleAddItem = (item) => {
     const newItems = [
-      ...this.state.items, // TODO: try  `, item` instead of {...}
-      {
-        id: item.id,
-        title: item.title,
-        content: item.content,
-        priority: item.priority,
-        done: item.done
-      }
+      item, ...this.state.items // add new item, then the existing ones
     ]
     this.setSource(newItems, newItems);
   }
@@ -70,11 +66,11 @@ export default class LoggedIn extends Component {
             enableEmptySections
             dataSource={this.state.dataSource}
             onScroll={() => Keyboard.dismiss()}
-            renderRow={({key, ...value}) => {
+            renderRow={({id, ...value}) => {
               return (
                 <Row
-                  onDone={(done) => this.handleToggleDone(key, done)}
-                  key={key}
+                  onDone={(done) => this.handleToggleDone(id, done)}
+                  id={id}
                   {...value}
                 />
               )
