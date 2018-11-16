@@ -7,7 +7,7 @@ import TodoItemForm from '../components/TodoItemForm';
 import Footer from '../components/Footer';
 
 import Row from '../components/Row';
-import { getTodoItems } from '../services/apiService';
+import { loadTodoItems, updateTodoItem } from '../services/apiService';
 
 export default class LoggedIn extends Component {
   constructor(props) {
@@ -17,8 +17,8 @@ export default class LoggedIn extends Component {
       items: [],
       dataSource: ds.cloneWithRows([])
     }
-    this.loadItems = getTodoItems.bind(this);
-    this.loadItems();
+    this.loadTodoItems = loadTodoItems.bind(this);
+    this.loadTodoItems();
   }
 
   /**
@@ -35,22 +35,26 @@ export default class LoggedIn extends Component {
     })
   }
 
-  handleToggleDone = (itemId, done) => {
-    const newItems = this.state.items.map((item) => {
-      if (item.id !== itemId) return item;
-      return {
-        ...item,
-        done // done: true or false
-      }
-    })
-    this.setSource(newItems, newItems);
+  handleToggleDone = (itemId, is_done) => {
+    updateTodoItem({ id: itemId, is_done })
+      .then((updatedItem) => {
+        if (!updatedItem) return;
+    
+        const newItems = this.state.items.map((item) => {
+          if (item.id !== itemId) return item;
+          return {
+            ...item, is_done // is_done: true or false
+          }
+        })
+        this.setSource(newItems, newItems);
+      })
   }
-
   handleAddItem = (item) => {
     const newItems = [
       item, ...this.state.items // add new item, then the existing ones
     ]
     this.setSource(newItems, newItems);
+
   }
 
   render() {
@@ -69,7 +73,7 @@ export default class LoggedIn extends Component {
             renderRow={({id, ...value}) => {
               return (
                 <Row
-                  onDone={(done) => this.handleToggleDone(id, done)}
+                  onDone={(is_done) => this.handleToggleDone(id, is_done)}
                   id={id}
                   {...value}
                 />

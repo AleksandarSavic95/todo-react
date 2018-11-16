@@ -2,6 +2,10 @@ import deviceStorage from './deviceStorage';
 
 import axios from 'axios';
 
+function makeAuthHeader(token) {
+  return { headers: { Authorization: "Bearer " + token }};
+}
+
 export async function post(url, data, options = {}) {
   try {
     const response = await axios.post(url, data, options);
@@ -39,7 +43,7 @@ export function postAuthenticated(url, data, callback) {
   console.log("\n==== postAuthenticated =====");
   deviceStorage.getJWT()
     .then(token => {
-      post(url, data, { headers: { Authorization: "Bearer " + token }})
+      post(url, data, makeAuthHeader(token))
       .then((item) => {
         callback(item);
       })
@@ -52,14 +56,29 @@ export function postAuthenticated(url, data, callback) {
 /**
  * Loads the todoItems of the authenticated user and adds them to the ListView.
  */
-export async function getTodoItems() {
-  console.log("\n==== getTodoItems =====");
+export async function loadTodoItems() {
+  console.log("\n==== loadTodoItems =====");
   try {
     const token = await deviceStorage.getJWT();
-    const response = await axios.get("http://app-backend.test/api/todoitems", { headers: { Authorization: "Bearer " + token }});
+    const response = await axios.get("http://app-backend.test/api/todoitems", makeAuthHeader(token));
     const items = response.data;
     if (items) {
       this.setSource(items, items);
+    }
+  }
+  catch (error) {
+    console.log("Error", error, error.message);
+  }
+}
+
+export async function updateTodoItem(item) {
+  console.log("\n==== updateTodoItem =====");
+  try {
+    const token = await deviceStorage.getJWT();
+    const response = await axios.put(`http://app-backend.test/api/todoitems/${item.id}`, item, makeAuthHeader(token));
+    const updatedItem = response.data;
+    if (updatedItem) {
+      return updatedItem;
     }
   }
   catch (error) {
