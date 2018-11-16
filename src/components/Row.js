@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Text, View, Switch, StyleSheet } from 'react-native'
-import { PRIORITIES } from './constants';
+import { PRIORITIES } from '../../constants';
 
 const priorityColor = {
     [PRIORITIES.LOW]: 'green',
