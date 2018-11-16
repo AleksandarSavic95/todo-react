@@ -1,43 +1,51 @@
 import React, { Component } from 'react';
 import { Loading } from './components/common/';
-import Auth from './screens/Auth';
+import { Registration, Login } from './components';
 import LoggedIn from './screens/LoggedIn';
 
 import deviceStorage from './services/deviceStorage';
 
-export default class App extends Component {
+import { createSwitchNavigator, createStackNavigator } from 'react-navigation';
+
+class AuthLoadingScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      jwt: '',
-      loading: true
-    }
-    // NOTE: binding functions from service to App! TODO: separation of duties..
-    this.deleteJWT = deviceStorage.deleteJWT.bind(this);
-    this.loadJWT = deviceStorage.loadJWT.bind(this);
-
-    this.loadJWT();
+    this._bootstrapAsync();
   }
 
-  setJWT = (jwt) => {
-    this.setState({
-      jwt: jwt
-    });
-  }
+  // Fetch the token from storage and navigate to corresponding screen
+  _bootstrapAsync = async () => {
+    const token = await deviceStorage.getJWT();
+    this.props.navigation.navigate(token ? 'App' : 'Auth');
+  };
 
   render() {
-    if (this.state.loading) {
-      return (
-        <Loading size={'large'} />
-       );
-    } else if (!this.state.jwt) {
-      return (
-        <Auth setJWT={this.setJWT} />
-      );
-    } else if (this.state.jwt) {
-      return (
-        <LoggedIn deleteJWT={this.deleteJWT} />
-      );
-    }
+    return (
+      <Loading size={'large'} />
+    );
   }
 }
+
+/**
+ *  N A V I G A T I O N   C O N F I G
+ */
+const AppStack = createStackNavigator(
+  {
+    Home: LoggedIn,
+    // TodoItemDetails: TodoItemDetails // TODO :)
+  },
+  {
+    initialRouteName: 'Home'
+  });
+const AuthStack = createStackNavigator({ Login: Login, Registration: Registration });
+
+export default createSwitchNavigator(
+  {
+    AuthLoading: AuthLoadingScreen,
+    App: AppStack,
+    Auth: AuthStack,
+  },
+  {
+    initialRouteName: 'AuthLoading',
+  }
+);

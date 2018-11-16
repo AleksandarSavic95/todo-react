@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component  } from 'react';
 import { View, Text } from 'react-native';
 import { Input, TextLink, Button, Loading } from './common';
 
-import axios from 'axios';
+import { register } from '../services/apiService';
 import deviceStorage from '../services/deviceStorage';
 import { JWT_STORAGE_KEY } from '../constants';
 
@@ -25,40 +25,18 @@ class Registration extends Component {
 
     this.setState({ error: '', loading: true });
 
-    axios.post("http://app-backend.test/api/auth/register", {
-      name,
-      email,
-      password,
-      password_confirmation
-    })
-    .then((response) => {
-      const { access_token } = response.data;
-      if (!access_token) {
-        const errorsByField = response.data;
-        
-        let errorMessage = '';
-        for (fieldName in errorsByField) {
-          errorMessage += errorsByField[fieldName].join(' ') + '\n';
+    register({ name, email, password, password_confirmation})
+      .then((response) => {
+        if (!response) return; // request error happened
+        if (!response.access_token) {  // data error happened
+          // only "error" and "loading" are returned
+          this.setState(response);
         }
-        // strip last '\n'
-        this.setState({ error: errorMessage.slice(0, -1), loading: false });
-      }
-      else {
-        deviceStorage.saveItem(JWT_STORAGE_KEY, access_token);
-        this.props.setJWT(access_token);
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      // deep destructuring - error.response.status  and  error.response.data.exception
-      const { response: { status }, response: { data: { exception } } } = error;
-      let requestErrorMessage = `Error ${status} - ${exception}`;
-      // if it's not an exception, then it is "Unauthorized" or a similar message
-      if (!exception) {
-        requestErrorMessage = `Error ${status} - ${error.response.data.error}`;
-      }
-      this.setState({ error: requestErrorMessage, loading: false });
-    });
+        else {
+          deviceStorage.saveItem(JWT_STORAGE_KEY, response.access_token);
+          this.props.navigation.navigate('App');
+        }
+      });
   }
 
   render() {
@@ -66,7 +44,7 @@ class Registration extends Component {
     const { form, section, errorTextStyle } = styles;
 
     return (
-      <Fragment>
+      <View style={styles.container}>
         <View style={form}>
           <View style={section}>
             <Input
@@ -112,22 +90,24 @@ class Registration extends Component {
           </Text>
 
           { // ternary expression - todo: replace with regular (?)
-            !loading ?
+            !loading ? (
               <Button onPress={this.registerUser}>
                 Register
               </Button>
-            :
+            ) : (
               <Loading size={'large'} />
+            )
           }
 
         </View>
-        <TextLink onPress={this.props.toggleAuthForm}>
+        <TextLink onPress={() => this.props.navigation.navigate('Login')}>
           Already have an account? Log in!
         </TextLink>
-      </Fragment>
+      </View>
     );
   }
 }
+
 
 const styles = {
   form: {
@@ -145,6 +125,11 @@ const styles = {
     alignSelf: 'center',
     fontSize: 18,
     color: 'red'
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems:'center'
   }
 };
 

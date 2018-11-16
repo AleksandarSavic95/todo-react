@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Text, View } from 'react-native';
 import { Input, TextLink, Loading, Button } from './common';
 
-import axios from 'axios';
+import { login } from '../services/apiService';
 import deviceStorage from '../services/deviceStorage';
 import { JWT_STORAGE_KEY } from '../constants';
 
@@ -22,38 +22,17 @@ class Login extends Component {
 
     this.setState({ error: '', loading: true });
 
-    axios.post("http://app-backend.test/api/auth/login", {
-      email,
-      password
-    })
+    login({ email, password })
     .then((response) => {
-      const { access_token } = response.data;
-      let dataErrorMessage = '';
-
-      if (!access_token) {
-        const errorsByField = response.data;
-
-        for (fieldName in errorsByField) {
-          dataErrorMessage += errorsByField[fieldName].join(' ') + '\n';
-        }
-        // strip last '\n'
-        this.setState({ error: dataErrorMessage.slice(0, -1), loading: false });
+      if (!response) return; // request error happened
+      if (!response.access_token) {  // data error happened
+        // only "error" and "loading" are returned
+        this.setState(response);
       }
       else {
-        deviceStorage.saveItem(JWT_STORAGE_KEY, access_token);
-        this.props.setJWT(access_token);
+        deviceStorage.saveItem(JWT_STORAGE_KEY, response.access_token);
+        this.props.navigation.navigate('App');
       }
-    })
-    .catch((error) => {
-      console.log(error);
-      // deep destructuring - error.response.status  and  error.response.data.exception
-      const { response: { status }, response: { data: { exception } } } = error;
-      let requestErrorMessage = `Error ${status} - ${exception}`;
-      // if it's not an exception, then it is "Unauthorized" or a similar message
-      if (!exception) {
-        requestErrorMessage = `Error ${status} - ${error.response.data.error}`;
-      }
-      this.setState({ error: requestErrorMessage, loading: false });
     });
   }
 
@@ -62,7 +41,7 @@ class Login extends Component {
     const { form, section, errorTextStyle } = styles;
 
     return (
-      <Fragment>
+      <View style={styles.container}>
         <View style={form}>
           <View style={section}>
             <Input
@@ -97,10 +76,10 @@ class Login extends Component {
             <Loading size={'large'} />
           }
         </View>
-        <TextLink onPress={this.props.toggleAuthForm}>
+        <TextLink onPress={() => this.props.navigation.navigate('Registration')}>
           Don't have an account? Register!
         </TextLink>
-      </Fragment>
+      </View>
     );
   }
 }
@@ -121,6 +100,11 @@ const styles = {
     alignSelf: 'center',
     fontSize: 18,
     color: 'red'
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems:'center'
   }
 };
 

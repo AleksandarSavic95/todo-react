@@ -6,6 +6,7 @@ import { Button } from '../components/common/';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Row from '../components/Row';
+import deviceStorage from '../services/deviceStorage';
 
 export default class LoggedIn extends Component {
   constructor(props) {
@@ -15,6 +16,11 @@ export default class LoggedIn extends Component {
       items: [],
       dataSource: ds.cloneWithRows([])
     }
+  }
+
+  logOut = async () => {
+    await deviceStorage.deleteJWT();
+    this.props.navigation.navigate('Auth');
   }
 
   /**
@@ -59,7 +65,7 @@ export default class LoggedIn extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Button onPress={this.props.deleteJWT}>
+        <Button onPress={this.logOut}>
           Log out
         </Button>
         <Header

@@ -12,6 +12,23 @@ const deviceStorage = {
     }
   },
 
+  /**
+   * Retrieve JWT from local storage and return it.
+   */
+  getJWT() {
+    try {
+      const jwt = AsyncStorage.getItem(JWT_STORAGE_KEY);
+      if (jwt !== null) {
+        return jwt;
+      }
+    } catch (error) {
+      console.log('AsyncStorage Error: ' + error.message);
+    }
+  },
+
+  /**
+   * Retrieve JWT from local storage and set it in the state.
+   */
   async loadJWT() {
     try {
       const value = await AsyncStorage.getItem(JWT_STORAGE_KEY);
