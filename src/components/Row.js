@@ -14,7 +14,9 @@ export default class Row extends Component {
   }
   
   render() {
-    const done = this.props.done;
+    // `done` comes as 1 or 0, but Switch needs a boolean
+    const done = !!this.props.is_done;
+    console.log("\nROW PROPS:", this.props);
     return (
       <View style={styles.container}>
         <Switch
